@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
 });
 
 require('./app/routes/note.routes.js')(app);
-
+require('./app/routes/sensor.routes.js')(app);
 // listen for requests
 app.listen(5566, () => {
     console.log("Server is listening on port 5566");
