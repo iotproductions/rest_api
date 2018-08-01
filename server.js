@@ -23,9 +23,43 @@ const dbConfig = require('./config/database.config.js');
 const mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
+// MongoDB connection options
+const connectOptions = { 
+  useMongoClient: true,
+  autoReconnect: true
+};
+// Create MongoDB connection
+var db = mongoose.connection;
+// Connecting to MongoDB 
+db.on('connecting', function() 
+{
+	console.log('connecting to MongoDB...');
+});
+// Error issues during connect to MongoDB 
+db.on('error', function(error) 
+{
+	console.error('Error in MongoDb connection: ' + error);
+	mongoose.disconnect();
+});
+// Connected to MongoDB 
+db.on('connected', function() 
+{
+	console.log('MongoDB connected!');
+});
 
-// Connecting to the database
-mongoose.connect(dbConfig.url)
+// Reconnecting to MongoDB 
+db.on('reconnected', function () 
+{
+	console.log('MongoDB reconnected!');
+});
+// Disconnected to MongoDB 
+db.on('disconnected', function() 
+{
+	console.log('MongoDB disconnected!');
+	mongoose.connect(dbConfig.url, connectOptions);
+});
+// Connecting to MongoDB via URI with options
+mongoose.connect(dbConfig.url, connectOptions)
 .then(() => {
     console.log("Successfully connected to the database");    
 }).catch(err => {
@@ -40,6 +74,7 @@ app.get('/', (req, res) => {
 
 require('./app/routes/note.routes.js')(app);
 require('./app/routes/sensor.routes.js')(app);
+require('./app/routes/node.routes.js')(app);
 // listen for requests
 app.listen(5566, () => {
     console.log("Server is listening on port 5566");

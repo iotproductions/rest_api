@@ -32,7 +32,8 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
     Sensor.find()
     .then(sensors => {
-        res.send(sensors);
+		
+        res.send({status: true, length: sensors.length, payload: sensors});
     }).catch(err => {
         res.status(500).send({
             message: err.message || "Some error occurred while retrieving sensors."
