@@ -65,15 +65,6 @@ var dataLength = {
 // MQTT Client config
 var mqtt_client = mqtt.connect(
 { 	
-/*
-	host: 'rynangate.com', 
-	port: 1903, 
-	keepalive: 60000,
-	username: 'MQTT_Rynan',
-	password: 'fR1D2y@3720@111q77ry11211',
-	protocolId: 'MQIsdp',
-	protocolVersion: 3
-	*/
 	host: 'smarthome.myftp.org', 
 	port: 1883, 
 	keepalive: 60000,
