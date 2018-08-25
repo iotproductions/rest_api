@@ -7,12 +7,12 @@ module.exports = (app) => {
     // Retrieve all Notes
     app.get('/nodes', nodes.findAll);
 
-    // Retrieve a single Sensor with sensorId
-    app.get('/nodes/:sensorId', nodes.findOne);
+    // Retrieve a single Sensor with nodeId
+    app.get('/nodes/:nodeId', nodes.findOne);
 
-    // Update a Sensor with sensorId
-    app.put('/nodes/:sensorId', nodes.update);
+    // Update a Sensor with nodeId
+    app.put('/nodes/:nodeId', nodes.update);
 
-    // Delete a Sensor with sensorId
-    app.delete('/nodes/:sensorId', nodes.delete);
+    // Delete a Sensor with nodeId
+    app.delete('/nodes/:nodeId', nodes.delete);
 }

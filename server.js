@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 var morgan   = require('morgan');
+var port     = process.env.PORT || 5566;
 // create express app
 const app = express();
 
@@ -75,7 +76,12 @@ app.get('/', (req, res) => {
 require('./app/routes/note.routes.js')(app);
 require('./app/routes/sensor.routes.js')(app);
 require('./app/routes/node.routes.js')(app);
+require('./app/routes/device.routes.js')(app);
 // listen for requests
-app.listen(5566, () => {
+
+app.listen(port, () => {
     console.log("Server is listening on port 5566");
 });
+
+
+

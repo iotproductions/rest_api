@@ -42,29 +42,29 @@ exports.findAll = (req, res) => {
     });
 };
 
-// Find a single node with a sensorId
+// Find a single node with a nodeId
 exports.findOne = (req, res) => {
-    Node.findById(req.params.sensorId)
+    Node.findById(req.params.nodeId)
     .then(node => {
         if(!node) {
             return res.status(404).send({
-                message: "Node not found with id " + req.params.sensorId
+                message: "Node not found with id " + req.params.nodeId
             });            
         }
         res.send(node);
     }).catch(err => {
         if(err.kind === 'ObjectId') {
             return res.status(404).send({
-                message: "Node not found with id " + req.params.sensorId
+                message: "Node not found with id " + req.params.nodeId
             });                
         }
         return res.status(500).send({
-            message: "Error retrieving node with id " + req.params.sensorId
+            message: "Error retrieving node with id " + req.params.nodeId
         });
     });
 };
 
-// Update a node identified by the sensorId in the request
+// Update a node identified by the nodeId in the request
 exports.update = (req, res) => {
     // Validate Request
     if(!req.body.SerialNumber) {
@@ -74,7 +74,7 @@ exports.update = (req, res) => {
     }
 
     // Find node and update it with the request body
-    Node.findByIdAndUpdate(req.params.sensorId, {
+    Node.findByIdAndUpdate(req.params.nodeId, {
         sensor_id: req.body.sensor_id, 
         sensor_type: req.body.sensor_type, 
 		temperature: req.body.temperature,
@@ -84,40 +84,40 @@ exports.update = (req, res) => {
     .then(node => {
         if(!node) {
             return res.status(404).send({
-                message: "Node not found with id " + req.params.sensorId
+                message: "Node not found with id " + req.params.nodeId
             });
         }
         res.send(node);
     }).catch(err => {
         if(err.kind === 'ObjectId') {
             return res.status(404).send({
-                message: "Node not found with id " + req.params.sensorId
+                message: "Node not found with id " + req.params.nodeId
             });                
         }
         return res.status(500).send({
-            message: "Error updating node with id " + req.params.sensorId
+            message: "Error updating node with id " + req.params.nodeId
         });
     });
 };
 
-// Delete a node with the specified sensorId in the request
+// Delete a node with the specified nodeId in the request
 exports.delete = (req, res) => {
-    Node.findByIdAndRemove(req.params.sensorId)
+    Node.findByIdAndRemove(req.params.nodeId)
     .then(node => {
         if(!node) {
             return res.status(404).send({
-                message: "Node not found with id " + req.params.sensorId
+                message: "Node not found with id " + req.params.nodeId
             });
         }
         res.send({message: "Node deleted successfully!"});
     }).catch(err => {
         if(err.kind === 'ObjectId' || err.name === 'NotFound') {
             return res.status(404).send({
-                message: "Node not found with id " + req.params.sensorId
+                message: "Node not found with id " + req.params.nodeId
             });                
         }
         return res.status(500).send({
-            message: "Could not delete node with id " + req.params.sensorId
+            message: "Could not delete node with id " + req.params.nodeId
         });
     });
 };
