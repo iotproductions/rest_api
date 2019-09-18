@@ -6,7 +6,8 @@ const NodeSchema = mongoose.Schema({
     sensor_type: String,
 	sensor_time: { type: Date, default: Date.now },
 	temperature: Number,
-	humidity: Number
+    humidity: Number,
+    payload: Array
 },{
     timestamps: true
 });

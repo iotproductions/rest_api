@@ -1,13 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 var morgan = require('morgan');
-var port = process.env.PORT || 7788
+var port = process.env.PORT || 3000
 var mqtt = require('mqtt')
 var schedule = require('node-schedule');
 var toBuffer = require('typedarray-to-buffer')
 var ieee754 = require('ieee754')
 var reverse_buffer = require("buffer-reverse")
 const Node = require('./app/models/node.model.js');
+const Device = require('./app/models/device.model.js');
 const request = require('supertest');
 
 var deviceType = {
@@ -169,63 +170,46 @@ var node_send_date;
 // MQTT Incomming message parser
 mqtt_client.on('message', function(topic, message) {
     // message is Buffer
-    console.log(topic.toString()); // Print topic string
-    console.log(message.toString('hex')); // Print buffer as hex string
-    // Create a Node
-
-    if (topic.toString() == "W/NODE/SMART_FARMING2") {
-        console.log('Received message on SMART_FARMING2');
-
-        node_send_date = new Date();
-
-        var message_len = message.length;
-        console.log('Message length: ', message_len);
-        var check_sum = (message[message_len - 2] << 8) + message[message_len - 1];
-        var compute_check_sum = 0;
-        for (var i = 0; i < message_len - 2; i++) {
-            compute_check_sum += message[i];
+    // console.log(topic.toString()); // Print topic string
+    
+    const [payload_direct, device_type, device_serial] = topic.toString().split('/');
+    console.log('Message from device: ', device_serial); // Apt 4
+    // console.log(message.toString('hex')); // Print buffer as hex string
+    try {
+        if (device_serial.length == 15)
+        {
+            Device.find({
+                SerialNumber: device_serial
+            }, function (err, docs) {
+                if (docs.length) 
+                {
+                    console.log("Docs: ", docs);
+                   console.log('Found device: ', device_serial + ' ,Device name: ' + docs[0].DeviceName);
+                   let payload = JSON.parse(message);
+                   console.log("JSON Payload: ", payload);
+                   let node_data = new Node;
+                   node_data.payload = payload;
+                   node_data.sensor_id = device_serial;
+                   node_data.sensor_type = "DS18B20";
+                   node_data.sensor_time = new Date();
+                   node_data.save(function (err) {
+                         if (err) {
+                             console.log(err);
+                         } 
+                         else {
+                            console.log('Save node data successfully !');
+                         }
+                     });
+                } 
+                else
+                {
+                    
+                    console.log('Device Not Found');
+                }
+            });
         }
-        console.log('Checksum: ', compute_check_sum);
-        if (compute_check_sum == check_sum) {
-            if (message[0] == deviceType.EMETER_DEVICE_TYPE) // DEvice is E-Mter 
-            {
-                // Get length of serialNumber 
-                var serial_number_len = message[1];
-                console.log('Serial length: ', serial_number_len);
-                // Get serialNumber
-                var serial_number = message.slice(2, 2 + serial_number_len).toString();
-                console.log('SerialNumber: ', serial_number);
-                node_serial_number = serial_number;
-                // Get RTC
-                var rtc_hour = Number(message[2 + serial_number_len].toString());
-                var rtc_minute = Number(message[3 + serial_number_len].toString());
-                var rtc_sec = Number(message[4 + serial_number_len].toString());
-                var rtc_date = Number(message[5 + serial_number_len].toString());
-                var rtc_month = Number(message[6 + serial_number_len].toString());
-                var rtc_year = Number(message[7 + serial_number_len].toString());
-                // Get payload length
-                var payload_len = Number((message[8 + serial_number_len] << 8) + message[9 + serial_number_len]);
-                console.log('Payload length: ', payload_len);
-                // Get number field
-                var number_field = message[10 + serial_number_len];
-                console.log('Number field: ', number_field);
-                // Payload frame
-                var data_frame = message.slice(11 + serial_number_len, message_len - 2);
-
-                payloadParser(number_field, data_frame);
-
-                var publish_options = {
-                    retain: false,
-                    qos: 1
-                };
-                //mqtt_client.publish('TEST', "THAN CO HO !",publish_options);
-                //console.log('Publish message to K2177E1E001N001');
-            } else {
-                console.log('Invalid E-Meter payload !');
-            }
-        } else {
-            console.log('Checksum failed !');
-        }
+    } catch (err) {
+        console.error(err)
     }
     //client.end();
 });
@@ -413,5 +397,5 @@ function dataFrameParser(parameter_code, format_type, data_length, data) {
 }
 
 app.listen(port, () => {
-    console.log("Server is listening on port 7788");
+    console.log("Server is listening on port: " + port);
 });
