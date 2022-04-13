@@ -16,7 +16,7 @@
   "author": "callicoder",
   "license": "MIT",
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^3.2.2",
     "body-parser": "^1.18.2",
     "buffer-reverse": "^1.0.1",
     "express": "^4.16.3",
